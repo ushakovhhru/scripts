@@ -1,0 +1,71 @@
+#!/usr/bin/python
+# vim: ft=python ts=4 sw=4 expandtab smartindent autoindent
+
+import sys, os, subprocess
+from py import OrderedDict
+
+if len(sys.argv) < 3:
+    print "usage: %s service daydir [daydir daydir ...]" % sys.argv[0]
+    sys.exit(1)
+
+service = sys.argv[1]
+
+tmpfile = "/tmp/ram/loganal.tmp"
+
+result = OrderedDict.OrderedDict()
+
+patterns = (
+    ('E', 'JdbcConnEx', '^.*?ERROR.*?JDBCConnectionException'),
+    ('F', 'CheckoutTo', 'Caused by: com.mchange.v2.resourcepool.TimeoutException'),
+    ('F', 'ResOverdue', 'A checked-out resource is overdue, and will be destroyed'),
+    ('E', 'LoadEntity', '^.*?ERROR.*?Exception: could not load an entity'),
+    ('F', 'SocketClos', 'SocketException: Socket closed'),
+    ('F', 'StreamClos', 'IOException: Stream closed'),
+)
+
+def out(s): sys.stdout.write(s)
+def shell(cmd): return subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE).communicate()[0]
+odict = OrderedDict.OrderedDict
+
+for daydir in sys.argv[2:]:
+    date = daydir[-10:]
+    result[date] = odict()
+    r_service = odict()
+    result[date][service] = r_service
+    for nodedir in os.listdir("%s/%s" % (daydir, service)):
+        r_nodedir = odict()
+        r_service[nodedir] = r_nodedir
+        gzfile = "%s/%s/%s/headhunter.log.gz" % (daydir, service, nodedir)
+        #out("Extracting %s\n" % gzfile)
+        shell("pigz -dc %s > %s" % (gzfile, tmpfile))
+        for flag, title, pattern in patterns:
+            foundtimes = int(shell("grep -c%s \"%s\" %s" % (flag, pattern, tmpfile)))
+            r_nodedir[title] = foundtimes
+        os.remove(tmpfile)
+
+out("             ")
+for _, title, _ in patterns:
+    out("%10s  " % title)
+out("\n")
+
+for day in result.keys():
+
+    total = odict()
+    for _, title, _ in patterns: total[title] = 0
+    for service in result[day].keys():
+        for node in result[day][service].keys():
+            for title in result[day][service][node].keys():
+                times = result[day][service][node][title]
+                total[title] += times
+    out("%10s    " % day)
+    for title in total.keys():
+        out("%10d  " % total[title])
+    out("\n")
+
+    for service in result[day].keys():
+        for node in result[day][service].keys():
+            out("  %-10s  " % node[:10])
+            for title in result[day][service][node].keys():
+                times = result[day][service][node][title]
+                out("%10d  " % times)
+            out("\n")

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+function do_usage() {
+	echo "usage: `basename $0` service date filepattern"
+	echo
+	echo "    Also, set OPER_USER to your user on oper.hh.ru"
+	exit 1
+}
+
+service="$1"
+date="$2"
+file="$3"
+
+if [[ -z $date || -z $service || -z $file ]]; then
+	do_usage
+fi
+
+ssh $OPER_USER@oper.hh.ru "ssh logging \"tar c /logging/java/${date}/${service}/**/${file}\"" | tar xv
