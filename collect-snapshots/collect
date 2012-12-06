@@ -1,0 +1,10 @@
+#!/bin/bash
+read -s -p "Debug password: " password
+echo
+cat urls | while read url; do
+	printf "%-30s " "$url"
+	curl -sS -L --location-trusted --basic --user hh:$password "http://$url/?debug" |
+		iconv -c -f utf-8 -t latin1 |
+		tr -d '\240' |
+		sed -ne 's/^.\+X-Hh-Snapshot: \([0-9a-z]\+\)<.\+$/\1/ p'
+done
