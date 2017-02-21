@@ -12,7 +12,10 @@ netstat --numeric-ports -aTp 2>/dev/null | grep -F ESTAB | awk '{print $7}' | se
         if [ "$pid" = "-" ]; then
                 cmd="<kernel>"
         else
-                cmd=$(ps -p $pid --no-headers -o args)
+                cmd=$(ps -ww -p $pid --no-headers -o args)
+                if [[ $cmd == *" -jar "* ]]; then
+                        cmd=$(echo $cmd | sed 's:^.* -jar \([^ ]\+\).*$:\1:')
+                fi
         fi
         printf "%8d  %s\n" "$conns" "$cmd"
 done
