@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Inclusive firewall rules: block any input except SSH from home/work or already established connections.
+
+homeip="37.110.91.2"
+workip="91.241.13.26/24"
+
+iptables -F
+
+# Allow local programs that use loopback (Unix sockets)
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+
+# Allow established connections
+iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+# SSH
+iptables -A INPUT -p tcp -s $homeip --dport 22 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp -s $workip --dport 22 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+
+# Drop invalid packets
+iptables -A INPUT -m conntrack --ctstate INVALID -j DROP
+
+# Default policy to drop 'everything' but our output to internet
+iptables -P FORWARD DROP
+iptables -P INPUT   DROP
+iptables -P OUTPUT  ACCEPT

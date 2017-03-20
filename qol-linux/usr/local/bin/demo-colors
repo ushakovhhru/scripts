@@ -1,0 +1,10 @@
+#!/bin/bash
+termwidth=$(tput cols)
+maxwords=$((termwidth / 11))
+for fg in {1..255}; do
+  printf "\033[38;5;${fg}mexample%-3s\033[0m " $fg
+  if ((fg % maxwords == 0)); then
+    echo
+  fi
+done
+echo

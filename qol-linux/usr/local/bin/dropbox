@@ -1,0 +1,2 @@
+#!/bin/bash
+exec nohup ~/apps/dropbox/dropboxd 1>/dev/null 2>&1 &

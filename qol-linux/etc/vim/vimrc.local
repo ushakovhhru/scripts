@@ -1,0 +1,6 @@
+color Tomorrow-Night-Bright
+set nobackup nowritebackup noundofile
+set encoding=utf8
+syn on
+set t_ti= t_te=
+set tabstop=2 expandtab sw=2
