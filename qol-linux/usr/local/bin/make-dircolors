@@ -11,7 +11,7 @@ WEIRD="$(c 33)"
 
 vimcmd '%s/\n/:/g' <<EOF
 rs=0
-di=$(c 178)
+di=$(c 137)
 ln=$(c 244)
 mh=$WEIRD
 pi=$WEIRD
