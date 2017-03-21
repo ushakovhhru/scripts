@@ -23,9 +23,18 @@ iptables -A INPUT -p tcp -s $workip --dport 22 -m conntrack --ctstate NEW,ESTABL
 
 # Nginx 80
 iptables -A INPUT -p tcp --dport 80 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp --dport 443 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+#iptables -A INPUT -p tcp -s $workip --dport 443 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
 
 # Drop invalid packets
 iptables -A INPUT -m conntrack --ctstate INVALID -j DROP
+
+iptables -A FORWARD -i eth0 -o lo -j ACCEPT
+iptables -A FORWARD -i lo -o eth0 -j ACCEPT
+
+iptables -A INPUT -j LOGGING
+iptables -A LOGGING -j LOG --log-prefix "NETFILTER " --log-level 7
+iptables -A LOGGING -j DROP
 
 # Default policy to drop 'everything' but our output to internet
 iptables -P FORWARD DROP
