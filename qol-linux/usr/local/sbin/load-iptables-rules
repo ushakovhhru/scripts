@@ -11,12 +11,18 @@ iptables -F
 iptables -A INPUT -i lo -j ACCEPT
 iptables -A OUTPUT -o lo -j ACCEPT
 
+# Allow all icmp
+iptables -A INPUT -p icmp -j ACCEPT
+
 # Allow established connections
 iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
 # SSH
 iptables -A INPUT -p tcp -s $homeip --dport 22 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
 iptables -A INPUT -p tcp -s $workip --dport 22 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+
+# Nginx 80
+iptables -A INPUT -p tcp --dport 80 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
 
 # Drop invalid packets
 iptables -A INPUT -m conntrack --ctstate INVALID -j DROP
