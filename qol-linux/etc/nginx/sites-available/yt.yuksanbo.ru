@@ -1,12 +1,12 @@
 upstream backend {
-  server localhost:8080;
+  server localhost:10003;
 }
 
 server {
   listen 443 ssl;
-	server_name us.wilemyvu.ru;
-  ssl_certificate /home/yura/Dropbox/Personal/Docs/keys/us.wilemyvu.ru.crt;
-  ssl_certificate_key /home/yura/Dropbox/Personal/Docs/keys/us.wilemyvu.ru.key;
+	server_name yt.yuksanbo.ru;
+  ssl_certificate /home/yura/Dropbox/Personal/Docs/keys/yt.yuksanbo.ru.crt;
+  ssl_certificate_key /home/yura/Dropbox/Personal/Docs/keys/yt.yuksanbo.ru.key;
 
 	location / {
     proxy_set_header X-Forwarded-Host $http_host;
