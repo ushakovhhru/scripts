@@ -66,7 +66,8 @@
 	".header .userpic {",
 	"    display: none !important;",
 	"}",
-    ".comment-text blockquote { margin-bottom: 0; background-color: #F5ECCE; border-left: 2px solid grey; }"
+    ".comment-text blockquote { margin-bottom: 0; background-color: #F5ECCE; border-left: 2px solid grey; }",
+    "b.lex { background-color: #FFC869; padding: 2px 6px 2px 6px; }"
 ].join("\n");
 if (typeof GM_addStyle != "undefined") {
 	GM_addStyle(css);
@@ -117,7 +118,20 @@ function prettifyDom() {
         if (modified) {
             comment.innerHTML = lines.join("");
         }
-    }    
+    }
+  
+    var commentAuthors = document.getElementsByClassName("i-ljuser-username");
+    for (var authorIdx = 0; authorIdx < commentAuthors.length; authorIdx++) {
+        var author = commentAuthors[authorIdx];
+        if (author.childNodes.length != 1) {
+            continue; /* wtf? */
+        }
+        var name = author.childNodes[0].innerText;
+        if (name != "lex_kravetski") {
+            continue;
+        }
+        author.childNodes[0].classList.add("lex");
+    }
 }
 
 document.addEventListener("DOMContentLoaded", function() {
